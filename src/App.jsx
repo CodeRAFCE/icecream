@@ -17,7 +17,7 @@ function App() {
 	const [empId, setEmpId] = useState();
 	const [uid, setUid] = useState();
 	const [token, setToken] = useState(COUNT);
-	const [selectedColor, setSelectedColor] = useState("");
+	const [selectedColor, setSelectedColor] = useState("RED");
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 
 	// * --------------------------------------------------------
@@ -115,12 +115,10 @@ function App() {
 							>
 								Send
 							</button>
-							<button
-								type="submit"
-								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
-							>
+
+							<a href="#" className="uppercase px-6 py-2 bg-orange-400 text-white rounded">
 								GO to EXCEL
-							</button>
+							</a>
 						</div>
 					</form>
 				</section>
