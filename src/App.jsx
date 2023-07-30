@@ -1,7 +1,5 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
-
-const COUNT = 1;
 
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
@@ -16,9 +14,21 @@ const COLOR_OPTIONS = [
 function App() {
 	const [empId, setEmpId] = useState();
 	// const [uid, setUid] = useState();
-	const [token, setToken] = useState(COUNT);
+	const [token, setToken] = useState();
 	const [selectedColor, setSelectedColor] = useState("RED");
 	// const [isSubmitted, setIsSubmitted] = useState(false);
+	const [initialCount, setInitialCount] = useState(1); // Initial value for token
+
+	useEffect(() => {
+		const initialCountFromLocalStorage = Number(localStorage.getItem("COUNT"));
+		if (initialCountFromLocalStorage) {
+			setInitialCount(initialCountFromLocalStorage);
+			setToken(initialCountFromLocalStorage); // Set token to initial value from localStorage
+		} else {
+			setToken(initialCount); // Set token to initial value 1
+			localStorage.setItem("COUNT", initialCount); // Save initial count in localStorage
+		}
+	}, []);
 
 	// * --------------------------------------------------------
 	// * FORM HANDLER METHODS
@@ -37,6 +47,15 @@ function App() {
 		e.preventDefault();
 		// setIsSubmitted(true);
 
+		// Increment token by 1
+		const updatedToken = token + 1;
+
+		// Update token state
+		setToken(updatedToken);
+
+		// Update token value in localStorage
+		localStorage.setItem("COUNT", updatedToken);
+
 		const data = {
 			empId,
 			// uid,
@@ -45,8 +64,6 @@ function App() {
 		};
 
 		console.log("SUBMIT CLICKED", data);
-
-		setToken((prev) => prev + 1);
 	};
 	// * --------------------------------------------------------
 
@@ -105,7 +122,7 @@ function App() {
 						</div>
 
 						<div className="p-8 text-center bg-white border border-zinc-300 rounded my-10">
-							<h1 className="text-2xl md:text-5xl font-semibold">TOKEN: {token}</h1>
+							<h1 className="text-2xl md:text-5xl font-semibold">TOKEN: {token || initialCount}</h1>
 						</div>
 
 						<div className="flex flex-row gap-3 justify-center">
