@@ -1,5 +1,8 @@
 import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
+import AlertIcon from "./components/AlertIcon";
+
+const SHEET_URL = `https://sheetdb.io/api/v1/qwtwehdqk2vy4`;
 
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
@@ -12,12 +15,21 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
+	const [sheetsData, setSheetsData] = useState();
 	const [empId, setEmpId] = useState("");
+	const [message, setMessage] = useState("");
 	// const [uid, setUid] = useState();
 	const [token, setToken] = useState();
 	const [selectedColor, setSelectedColor] = useState("RED");
+	const [duplicate, setDuplicate] = useState(false);
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 	const [initialCount, setInitialCount] = useState(1); // Initial value for token
+
+	const getSheetData = () => {
+		fetch(SHEET_URL)
+			.then((response) => response.json())
+			.then((data) => setSheetsData(data));
+	};
 
 	useEffect(() => {
 		const initialCountFromLocalStorage = Number(localStorage.getItem("COUNT"));
@@ -28,6 +40,7 @@ function App() {
 			setToken(initialCount); // Set token to initial value 1
 			localStorage.setItem("COUNT", initialCount); // Save initial count in localStorage
 		}
+		getSheetData();
 	}, [initialCount]);
 
 	// * --------------------------------------------------------
@@ -37,6 +50,7 @@ function App() {
 	const resetForm = () => {
 		console.log("RESET FORM");
 		setEmpId("");
+		setDuplicate(false);
 		setSelectedColor("RED");
 	};
 
@@ -52,6 +66,19 @@ function App() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+
+		// Check if empId exists in sheetsData
+		const isEmpIdDuplicate = sheetsData?.some((entry) => entry?.employeeID === empId);
+
+		console.log(isEmpIdDuplicate);
+
+		if (isEmpIdDuplicate) {
+			setMessage(
+				"Employee ID already exists. Please Verify with the employee to resolve any issue."
+			);
+			return; // Do not proceed with form submission
+		}
+
 		// setIsSubmitted(true);
 
 		// Increment token by 1
@@ -62,16 +89,37 @@ function App() {
 
 		// Update token value in localStorage
 		localStorage.setItem("COUNT", updatedToken);
+		const isDuplicateYesOrNo = duplicate ? "yes" : "no";
 
 		const data = {
 			empId,
 			// uid,
+			isDuplicateYesOrNo,
 			token,
 			selectedColor,
 		};
 
-		console.log("SUBMIT CLICKED", data);
-		resetForm();
+		if (!isEmpIdDuplicate) {
+			fetch(SHEET_URL, {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					employeeID: data.empId,
+					colors: selectedColor,
+					token: data.token,
+					duplicates: data.isDuplicateYesOrNo,
+				}),
+			})
+				.then((response) => {
+					response.json();
+					resetForm();
+					getSheetData();
+				})
+				.then((data) => console.log(data));
+		}
 	};
 	// * --------------------------------------------------------
 
@@ -86,6 +134,13 @@ function App() {
 
 			<main className="max-w-7xl mx-auto px-6">
 				<section>
+					{message ? (
+						<div className="my-6 flex items-center gap-3 justify-center bg-red-300 py-3 md:max-w-4xl md:mx-auto rounded-sm">
+							<AlertIcon />
+							<span className="text-lg font-semibold text-white">{message}</span>
+						</div>
+					) : null}
+
 					<form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
 						<div className="space-y-4">
 							<fieldset>
@@ -132,6 +187,20 @@ function App() {
 									resetValue={selectedColor}
 								/>
 							</fieldset>
+
+							<fieldset className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									name="dups"
+									id="dups"
+									checked={duplicate}
+									value={duplicate}
+									onChange={() => setDuplicate(!duplicate)}
+								/>
+								<label htmlFor="dups">
+									Only check if you have to create a duplicate entry in the sheet
+								</label>
+							</fieldset>
 						</div>
 
 						<div className="p-8 text-center bg-white border border-zinc-300 rounded my-10">
@@ -146,8 +215,13 @@ function App() {
 								Send
 							</button>
 
-							<a href="#" className="uppercase px-6 py-2 bg-orange-400 text-white rounded">
-								GO to EXCEL
+							<a
+								href="https://docs.google.com/spreadsheets/d/1_1elewbG74jJQStX2h6Hb-8uCC-0PpY9x5U3XEYjajg/edit#gid=0"
+								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
+								target="_blank"
+								rel="noreferrer"
+							>
+								GO to SHEET
 							</a>
 						</div>
 					</form>
