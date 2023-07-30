@@ -1,9 +1,19 @@
 import PropTypes from "prop-types";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
-const CustomDropdown = ({options, onChange}) => {
+const CustomDropdown = ({options, onChange, resetValue}) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOption, setSelectedOption] = useState(options[0]);
+
+	// Update the selectedOption when the resetValue changes
+	useEffect(() => {
+		if (resetValue) {
+			const option = options.find((opt) => opt.name === resetValue);
+			if (option) {
+				setSelectedOption(option);
+			}
+		}
+	}, [resetValue, options]);
 
 	const toggleDropdown = () => {
 		setIsOpen(!isOpen);
@@ -67,6 +77,7 @@ const CustomDropdown = ({options, onChange}) => {
 CustomDropdown.propTypes = {
 	options: PropTypes.array.isRequired,
 	onChange: PropTypes.func.isRequired,
+	resetValue: PropTypes.string,
 };
 
 export default CustomDropdown;

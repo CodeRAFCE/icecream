@@ -12,7 +12,7 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
-	const [empId, setEmpId] = useState();
+	const [empId, setEmpId] = useState("");
 	// const [uid, setUid] = useState();
 	const [token, setToken] = useState();
 	const [selectedColor, setSelectedColor] = useState("RED");
@@ -28,10 +28,17 @@ function App() {
 			setToken(initialCount); // Set token to initial value 1
 			localStorage.setItem("COUNT", initialCount); // Save initial count in localStorage
 		}
-	}, []);
+	}, [initialCount]);
 
 	// * --------------------------------------------------------
 	// * FORM HANDLER METHODS
+
+	// Function to reset form fields
+	const resetForm = () => {
+		console.log("RESET FORM");
+		setEmpId("");
+		setSelectedColor("RED");
+	};
 
 	const onEmpIdChange = (event) => {
 		const employeeId = event.target.value;
@@ -64,6 +71,7 @@ function App() {
 		};
 
 		console.log("SUBMIT CLICKED", data);
+		resetForm();
 	};
 	// * --------------------------------------------------------
 
@@ -88,6 +96,7 @@ function App() {
 									name="empId"
 									id="empId"
 									type="text"
+									value={empId}
 									onChange={onEmpIdChange}
 									placeholder="Enter Employee ID"
 									className="border border-slate-500 focus:outline-none px-2 py-2 w-full rounded"
@@ -117,7 +126,11 @@ function App() {
 									colors
 								</label>
 
-								<CustomDropdown options={COLOR_OPTIONS} onChange={setSelectedColor} />
+								<CustomDropdown
+									options={COLOR_OPTIONS}
+									onChange={setSelectedColor}
+									resetValue={selectedColor}
+								/>
 							</fieldset>
 						</div>
 
