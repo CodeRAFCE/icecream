@@ -15,7 +15,7 @@ const COLOR_OPTIONS = [
 
 function App() {
 	const [empId, setEmpId] = useState();
-	const [uid, setUid] = useState();
+	// const [uid, setUid] = useState();
 	const [token, setToken] = useState(COUNT);
 	const [selectedColor, setSelectedColor] = useState("RED");
 	// const [isSubmitted, setIsSubmitted] = useState(false);
@@ -25,13 +25,13 @@ function App() {
 
 	const onEmpIdChange = (event) => {
 		const employeeId = event.target.value;
-		setUid(employeeId);
+		setEmpId(employeeId);
 	};
 
-	const onUidChange = (event) => {
-		const uniqueId = event.target.value;
-		setEmpId(uniqueId);
-	};
+	// const onUidChange = (event) => {
+	// 	const uniqueId = event.target.value;
+	// 	setUid(uniqueId);
+	// };
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -39,7 +39,7 @@ function App() {
 
 		const data = {
 			empId,
-			uid,
+			// uid,
 			token,
 			selectedColor,
 		};
@@ -80,7 +80,7 @@ function App() {
 
 							{/* ------------------------------------------------------------------ */}
 
-							<fieldset>
+							{/* <fieldset>
 								<label htmlFor="uid" className="font-semibold uppercase">
 									UID
 								</label>
@@ -93,7 +93,7 @@ function App() {
 									className="border border-slate-500 focus:outline-none px-2 py-2 w-full rounded"
 									required
 								/>
-							</fieldset>
+							</fieldset> */}
 
 							<fieldset>
 								<label htmlFor="colors" className="font-semibold uppercase">
