@@ -2,6 +2,8 @@ import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
 import AlertIcon from "./components/AlertIcon";
 
+const SHEET_URL = `https://sheetdb.io/api/v1/qwtwehdqk2vy4`;
+
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
 	{color: "orange", name: "ORANGE", id: 2, icon: ""},
@@ -13,6 +15,7 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
+	const [sheetsData, setSheetsData] = useState();
 	const [empId, setEmpId] = useState("");
 	const [message, setMessage] = useState("");
 	// const [uid, setUid] = useState();
@@ -21,6 +24,12 @@ function App() {
 	const [duplicate, setDuplicate] = useState(false);
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 	const [initialCount, setInitialCount] = useState(1); // Initial value for token
+
+	const getSheetData = () => {
+		fetch(SHEET_URL)
+			.then((response) => response.json())
+			.then((data) => setSheetsData(data));
+	};
 
 	useEffect(() => {
 		const initialCountFromLocalStorage = Number(localStorage.getItem("COUNT"));
@@ -31,6 +40,7 @@ function App() {
 			setToken(initialCount); // Set token to initial value 1
 			localStorage.setItem("COUNT", initialCount); // Save initial count in localStorage
 		}
+		getSheetData();
 	}, [initialCount]);
 
 	// * --------------------------------------------------------
@@ -42,7 +52,6 @@ function App() {
 		setEmpId("");
 		setDuplicate(false);
 		setSelectedColor("RED");
-		setMessage("");
 	};
 
 	const onEmpIdChange = (event) => {
@@ -55,8 +64,20 @@ function App() {
 	// 	setUid(uniqueId);
 	// };
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = (e) => {
 		e.preventDefault();
+
+		// Check if empId exists in sheetsData
+		const isEmpIdDuplicate = sheetsData?.some((entry) => entry?.employeeID === empId);
+
+		console.log(isEmpIdDuplicate);
+
+		if (isEmpIdDuplicate) {
+			setMessage(
+				"Employee ID already exists. Please Verify with the employee to resolve any issue."
+			);
+			return; // Do not proceed with form submission
+		}
 
 		// setIsSubmitted(true);
 
@@ -71,15 +92,34 @@ function App() {
 		const isDuplicateYesOrNo = duplicate ? "yes" : "no";
 
 		const data = {
-			employeeId: empId,
-			colors: selectedColor,
-			token: token,
-			duplicates: isDuplicateYesOrNo,
+			empId,
 			// uid,
+			isDuplicateYesOrNo,
+			token,
+			selectedColor,
 		};
 
-		console.log(data);
-		resetForm();
+		if (!isEmpIdDuplicate) {
+			fetch(SHEET_URL, {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					employeeID: data.empId,
+					colors: selectedColor,
+					token: data.token,
+					duplicates: data.isDuplicateYesOrNo,
+				}),
+			})
+				.then((response) => {
+					response.json();
+					resetForm();
+					getSheetData();
+				})
+				.then((data) => console.log(data));
+		}
 	};
 	// * --------------------------------------------------------
 
@@ -183,14 +223,6 @@ function App() {
 							>
 								GO to SHEET
 							</a>
-
-							<div
-								className="uppercase px-6 py-2 bg-red-400 text-white rounded cursor-pointer"
-								target="_blank"
-								rel="noreferrer"
-							>
-								Delete Sheet data
-							</div>
 						</div>
 					</form>
 				</section>
