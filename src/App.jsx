@@ -2,9 +2,7 @@ import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
 import AlertIcon from "./components/AlertIcon";
 
-const SHEET_URL_POST = `https://script.google.com/macros/s/${
-	import.meta.env.VITE_GOOGLE_SHEET_DEPLOYMENT_ID_POST
-}/exec`;
+const SHEET_URL = `https://sheetdb.io/api/v1/qwtwehdqk2vy4`;
 
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
@@ -17,14 +15,22 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
+	const [sheetsData, setSheetsData] = useState();
 	const [empId, setEmpId] = useState("");
 	const [message, setMessage] = useState("");
+	// const [uid, setUid] = useState();
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState();
 	const [selectedColor, setSelectedColor] = useState("RED");
 	const [duplicate, setDuplicate] = useState(false);
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 	const [initialCount, setInitialCount] = useState(1); // Initial value for token
+
+	const getSheetData = () => {
+		fetch(SHEET_URL)
+			.then((response) => response.json())
+			.then((data) => setSheetsData(data));
+	};
 
 	useEffect(() => {
 		const initialCountFromLocalStorage = Number(localStorage.getItem("COUNT"));
@@ -35,6 +41,7 @@ function App() {
 			setToken(initialCount); // Set token to initial value 1
 			localStorage.setItem("COUNT", initialCount); // Save initial count in localStorage
 		}
+		getSheetData();
 	}, [initialCount]);
 
 	// * --------------------------------------------------------
@@ -42,10 +49,10 @@ function App() {
 
 	// Function to reset form fields
 	const resetForm = () => {
+		console.log("RESET FORM");
 		setEmpId("");
 		setDuplicate(false);
 		setSelectedColor("RED");
-		setMessage("");
 		setLoading(false);
 	};
 
@@ -59,42 +66,62 @@ function App() {
 	// 	setUid(uniqueId);
 	// };
 
-	const handleSubmit = async (e) => {
-		try {
-			e.preventDefault();
+	const handleSubmit = (e) => {
+		e.preventDefault();
 
-			setLoading(true);
+		setLoading(true);
+		// Check if empId exists in sheetsData
+		const isEmpIdDuplicate = sheetsData?.some((entry) => entry?.employeeID === empId);
 
-			// Increment token by 1
-			const updatedToken = token + 1;
+		console.log(isEmpIdDuplicate);
 
-			// Update token state
-			setToken(updatedToken);
+		if (isEmpIdDuplicate) {
+			setMessage(
+				"Employee ID already exists. Please Verify with the employee to resolve any issue."
+			);
+			return; // Do not proceed with form submission
+		}
 
-			// Update token value in localStorage
-			localStorage.setItem("COUNT", updatedToken);
-			const isDuplicateYesOrNo = duplicate ? "yes" : "no";
+		// setIsSubmitted(true);
 
-			const formData = {
-				employeeID: empId,
-				colors: selectedColor,
-				token: token,
-				duplicates: isDuplicateYesOrNo,
-				// uid,
-			};
+		// Increment token by 1
+		const updatedToken = token + 1;
 
-			await fetch(SHEET_URL_POST, {
+		// Update token state
+		setToken(updatedToken);
+
+		// Update token value in localStorage
+		localStorage.setItem("COUNT", updatedToken);
+		const isDuplicateYesOrNo = duplicate ? "yes" : "no";
+
+		const data = {
+			empId,
+			// uid,
+			isDuplicateYesOrNo,
+			token,
+			selectedColor,
+		};
+
+		if (!isEmpIdDuplicate) {
+			fetch(SHEET_URL, {
 				method: "POST",
 				headers: {
+					Accept: "application/json",
 					"Content-Type": "application/json",
-					"Access-Control-Allow-Origin": "*",
 				},
-				body: JSON.stringify(formData),
-			});
-
-			resetForm();
-		} catch (error) {
-			console.log(error);
+				body: JSON.stringify({
+					employeeID: data.empId,
+					colors: selectedColor,
+					token: data.token,
+					duplicates: data.isDuplicateYesOrNo,
+				}),
+			})
+				.then((response) => {
+					response.json();
+					resetForm();
+					getSheetData();
+				})
+				.then((data) => console.log(data));
 		}
 	};
 	// * --------------------------------------------------------
@@ -187,29 +214,18 @@ function App() {
 							<button
 								type="submit"
 								className="uppercase px-6 py-2 bg-orange-400 text-white rounded disabled:bg-slate-400 disabled:cursor-not-allowed"
-								disabled={loading}
 							>
 								{loading ? "Loading..." : "Send"}
 							</button>
 
 							<a
-								href={`https://docs.google.com/spreadsheets/d/${
-									import.meta.env.VITE_GOOGLE_SHEET_ID
-								}/edit#gid=0`}
+								href="https://docs.google.com/spreadsheets/d/1_1elewbG74jJQStX2h6Hb-8uCC-0PpY9x5U3XEYjajg/edit#gid=0"
 								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
 								target="_blank"
 								rel="noreferrer"
 							>
 								GO to SHEET
 							</a>
-
-							<div
-								className="uppercase px-6 py-2 bg-red-400 text-white rounded cursor-pointer"
-								target="_blank"
-								rel="noreferrer"
-							>
-								Delete Sheet data
-							</div>
 						</div>
 					</form>
 				</section>
