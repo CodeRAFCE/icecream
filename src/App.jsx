@@ -35,6 +35,25 @@ function App() {
 		setLoading(false);
 	};
 
+	const deleteBatchSheetData = () => {
+		setLoading(true);
+		fetch(`${SHEET_URL}/all`, {
+			method: "DELETE",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+				// After successful deletion, set token back to 1
+				setToken(1);
+				localStorage.setItem("COUNT", 1); // Update the localStorage to 1
+			})
+			.finally(() => setLoading(false));
+	};
+
 	useEffect(() => {
 		const initialCountFromLocalStorage = Number(localStorage.getItem("COUNT"));
 		if (initialCountFromLocalStorage) {
@@ -235,6 +254,14 @@ function App() {
 							>
 								GO to SHEET
 							</a>
+							<div
+								className="uppercase px-6 py-2 bg-red-400 text-white rounded cursor-pointer"
+								target="_blank"
+								rel="noreferrer"
+								onClick={deleteBatchSheetData}
+							>
+								Delete Sheet data
+							</div>
 						</div>
 					</form>
 				</section>
