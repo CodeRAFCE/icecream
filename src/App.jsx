@@ -125,6 +125,8 @@ function App() {
 				})
 				.then((data) => console.log(data));
 		}
+
+		setLoading(false);
 	};
 	// * --------------------------------------------------------
 
