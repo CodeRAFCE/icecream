@@ -27,9 +27,12 @@ function App() {
 	const [initialCount, setInitialCount] = useState(1); // Initial value for token
 
 	const getSheetData = () => {
+		setLoading(true);
 		fetch(SHEET_URL)
 			.then((response) => response.json())
 			.then((data) => setSheetsData(data));
+
+		setLoading(false);
 	};
 
 	useEffect(() => {
@@ -82,6 +85,7 @@ function App() {
 			setMessage(
 				"Employee ID already exists. Please Verify with the employee to resolve any issue."
 			);
+			setLoading(false);
 			return; // Do not proceed with form submission
 		}
 
