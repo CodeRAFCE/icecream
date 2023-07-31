@@ -2,6 +2,10 @@ import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
 import AlertIcon from "./components/AlertIcon";
 
+const SHEET_URL_POST = `https://script.google.com/macros/s/${
+	import.meta.env.VITE_GOOGLE_SHEET_DEPLOYMENT_ID_POST
+}/exec`;
+
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
 	{color: "orange", name: "ORANGE", id: 2, icon: ""},
@@ -15,7 +19,7 @@ const COLOR_OPTIONS = [
 function App() {
 	const [empId, setEmpId] = useState("");
 	const [message, setMessage] = useState("");
-	// const [uid, setUid] = useState();
+	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState();
 	const [selectedColor, setSelectedColor] = useState("RED");
 	const [duplicate, setDuplicate] = useState(false);
@@ -38,11 +42,11 @@ function App() {
 
 	// Function to reset form fields
 	const resetForm = () => {
-		console.log("RESET FORM");
 		setEmpId("");
 		setDuplicate(false);
 		setSelectedColor("RED");
 		setMessage("");
+		setLoading(false);
 	};
 
 	const onEmpIdChange = (event) => {
@@ -56,30 +60,42 @@ function App() {
 	// };
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		try {
+			e.preventDefault();
 
-		// setIsSubmitted(true);
+			setLoading(true);
 
-		// Increment token by 1
-		const updatedToken = token + 1;
+			// Increment token by 1
+			const updatedToken = token + 1;
 
-		// Update token state
-		setToken(updatedToken);
+			// Update token state
+			setToken(updatedToken);
 
-		// Update token value in localStorage
-		localStorage.setItem("COUNT", updatedToken);
-		const isDuplicateYesOrNo = duplicate ? "yes" : "no";
+			// Update token value in localStorage
+			localStorage.setItem("COUNT", updatedToken);
+			const isDuplicateYesOrNo = duplicate ? "yes" : "no";
 
-		const data = {
-			employeeId: empId,
-			colors: selectedColor,
-			token: token,
-			duplicates: isDuplicateYesOrNo,
-			// uid,
-		};
+			const formData = {
+				employeeID: empId,
+				colors: selectedColor,
+				token: token,
+				duplicates: isDuplicateYesOrNo,
+				// uid,
+			};
 
-		console.log(data);
-		resetForm();
+			await fetch(SHEET_URL_POST, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Origin": "*",
+				},
+				body: JSON.stringify(formData),
+			});
+
+			resetForm();
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	// * --------------------------------------------------------
 
@@ -170,13 +186,16 @@ function App() {
 						<div className="flex flex-row gap-3 justify-center">
 							<button
 								type="submit"
-								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
+								className="uppercase px-6 py-2 bg-orange-400 text-white rounded disabled:bg-slate-400 disabled:cursor-not-allowed"
+								disabled={loading}
 							>
-								Send
+								{loading ? "Loading..." : "Send"}
 							</button>
 
 							<a
-								href="https://docs.google.com/spreadsheets/d/1_1elewbG74jJQStX2h6Hb-8uCC-0PpY9x5U3XEYjajg/edit#gid=0"
+								href={`https://docs.google.com/spreadsheets/d/${
+									import.meta.env.VITE_GOOGLE_SHEET_ID
+								}/edit#gid=0`}
 								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
 								target="_blank"
 								rel="noreferrer"
