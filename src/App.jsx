@@ -54,6 +54,7 @@ function App() {
 		setDuplicate(false);
 		setSelectedColor("RED");
 		setLoading(false);
+		setMessage("");
 	};
 
 	const onEmpIdChange = (event) => {
