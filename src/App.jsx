@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
 import AlertIcon from "./components/AlertIcon";
 
-const SHEET_URL = `https://sheetdb.io/api/v1/qwtwehdqk2vy4`;
+const SHEET_URL = `https://sheetdb.io/api/v1/0d686gm3nst8w`;
 
 const COLOR_OPTIONS = [
 	{color: "red", name: "RED", id: 1, icon: ""},
