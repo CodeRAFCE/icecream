@@ -221,9 +221,7 @@ function App() {
 							</button>
 
 							<a
-								href={`https://docs.google.com/spreadsheets/d/${
-									import.meta.env.VITE_GOOGLE_SHEET_ID
-								}/edit#gid=0`}
+								href={`https://docs.google.com/spreadsheets/d/1Sk2djRliwCdoyLKCleICc1bxoBbZ41_2Tu7IOQ0ic4Y/edit#gid=0`}
 								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
 								target="_blank"
 								rel="noreferrer"
