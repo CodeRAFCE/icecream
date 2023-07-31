@@ -71,7 +71,9 @@ function App() {
 
 		setLoading(true);
 		// Check if empId exists in sheetsData
-		const isEmpIdDuplicate = sheetsData?.some((entry) => entry?.employeeID === empId);
+		const isEmpIdDuplicate = sheetsData?.some(
+			(entry) => entry?.employeeID.toUpperCase() === empId.toUpperCase()
+		);
 
 		console.log(isEmpIdDuplicate);
 
@@ -110,7 +112,7 @@ function App() {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					employeeID: data.empId,
+					employeeID: data.empId.toUpperCase(),
 					colors: selectedColor,
 					token: data.token,
 					duplicates: data.isDuplicateYesOrNo,
