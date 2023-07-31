@@ -33,6 +33,8 @@ function App() {
 			.then((data) => setSheetsData(data));
 
 		setLoading(false);
+
+		console.log("GET SHEET DATA");
 	};
 
 	const deleteBatchSheetData = () => {
