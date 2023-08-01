@@ -271,7 +271,7 @@ function App() {
 		// Reset previous error messages
 		setMessageStatus({status: "", message: ""});
 
-		const isCodeAuthorized = code === AUTHORIZATION_CODE; //`${import.meta.env.VITE_PERMISSION_CODE}`
+		const isCodeAuthorized = Number(code) === AUTHORIZATION_CODE; //`${import.meta.env.VITE_PERMISSION_CODE}`
 
 		if (!isCodeAuthorized && duplicate) {
 			setMessageStatus({
