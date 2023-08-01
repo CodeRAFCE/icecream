@@ -153,7 +153,7 @@ function App() {
 		if (isEmpIdDuplicate && !duplicate) {
 			setMessageStatus({
 				status: "ALERT",
-				message: "EMPLOYEE ID ALREADY REGISTERED",
+				message: "ATTUID ALREADY REGISTERED",
 			});
 			setLoading(false);
 			return; // Do not proceed with form submission
