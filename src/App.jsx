@@ -173,12 +173,14 @@ function App() {
 		if (!isEmpIdDuplicate && !isTokenDuplicate) {
 			console.log("sending normally");
 			sendSheetEntry(data);
+			return;
 		}
 
 		// sending a duplicate Employee ID entry if duplicate is checked
 		if (isEmpIdDuplicate && duplicate && !isTokenDuplicate) {
 			console.log("send from duplicate");
 			sendSheetEntry(data);
+			return;
 		}
 
 		setLoading(false);
