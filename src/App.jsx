@@ -532,6 +532,7 @@ function App() {
 								<button
 									type="submit"
 									className="uppercase px-12 py-2 bg-green-400 text-white rounded-full disabled:bg-slate-400 disabled:cursor-not-allowed font-medium"
+									disabled={loading}
 								>
 									{loading ? "Loading..." : "Send"}
 								</button>
