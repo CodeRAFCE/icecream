@@ -3,7 +3,7 @@ import CustomDropdown from "./components/CustomDropdown";
 import MessageStatus from "./components/MessageStatus";
 import ColorCode from "./components/ColorCode";
 
-const SHEET_URL = `https://sheetdb.io/api/v1/0d686gm3nst8w`;
+const SHEET_URL = `https://sheetdb.io/api/v1/${import.meta.env.VITE_SHEETDB_ID}`;
 const MULTI_SHEET_URL = `${SHEET_URL}?sheet=`;
 
 // eslint-disable-next-line no-unused-vars
@@ -47,7 +47,7 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
-	const [sheetsData, setSheetsData] = useState([]);
+	const [sheetsData, setSheetsData] = useState(null);
 	const [empId, setEmpId] = useState("");
 	const [messageStatus, setMessageStatus] = useState({status: "", message: ""});
 	const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ function App() {
 	const [tokenBlueTwo, setTokenBlueTwo] = useState("");
 	const [selectedColor, setSelectedColor] = useState("Pink");
 	const [duplicate, setDuplicate] = useState(false);
-	const [code, setCode] = useState(false);
+	const [code, setCode] = useState("");
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 
 	// Function to reset form fields
@@ -124,23 +124,23 @@ function App() {
 		const PINK_DATA = {
 			attuid: empId,
 			colors: "PINK",
-			token: tokenPink,
+			token: Number(tokenPink),
 			duplicates: isDuplicateYesOrNo,
 		};
 
 		const GREEN_DATA = {
 			attuid: empId,
 			colors: "GREEN",
-			token1: tokenGreenOne,
-			token2: tokenBlueTwo,
+			token1: Number(tokenGreenOne),
+			token2: Number(tokenGreenTwo),
 			duplicates: isDuplicateYesOrNo,
 		};
 
 		const BLUE_DATA = {
 			attuid: empId,
 			colors: "BLUE",
-			token1: tokenBlueOne,
-			token2: tokenGreenTwo,
+			token1: Number(tokenBlueOne),
+			token2: Number(tokenBlueTwo),
 			duplicates: isDuplicateYesOrNo,
 		};
 
@@ -270,10 +270,12 @@ function App() {
 		// Reset previous error messages
 		setMessageStatus({status: "", message: ""});
 
-		if (code === import.meta.env.VITE_PERMISSION_CODE) {
+		const isCodeAuthorized = code === `${import.meta.env.VITE_PERMISSION_CODE}`;
+
+		if (!isCodeAuthorized && duplicate) {
 			setMessageStatus({
 				status: "ALERT",
-				message: "YOU ARE NOT AUTHORIZED TO DUPLICATE AN ENTRY",
+				message: "YOU ARE NOT AUTHORIZED FOR A DUPLICATE ENTRY",
 			});
 			setLoading(false);
 			return; // Do not proceed with form submission
@@ -305,7 +307,7 @@ function App() {
 		// 	(entry) => Number(entry?.token) === Number(tokenPink)
 		// );
 
-		// console.log(isTokenDuplicate, duplicate);
+		console.log(isAttUidDuplicate, duplicate);
 
 		if (isAttUidDuplicate && !duplicate) {
 			setMessageStatus({
@@ -338,7 +340,7 @@ function App() {
 
 		// && !isTokenDuplicate
 		// sending a duplicate Employee ID entry if duplicate is checked
-		if (isAttUidDuplicate && duplicate) {
+		if (isAttUidDuplicate && duplicate && isCodeAuthorized) {
 			console.log("send from duplicate");
 
 			sendSheetEntryReq(isDuplicateYesOrNo);
@@ -555,7 +557,7 @@ function App() {
 											<input
 												name="code"
 												id="code"
-												type="number"
+												type="text"
 												value={code}
 												onChange={onCodeChange}
 												placeholder="Enter Code"
