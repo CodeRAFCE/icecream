@@ -120,7 +120,7 @@ function App() {
 	const sendSheetEntryReq = (isDuplicateYesOrNo) => {
 		const PINK_DATA = {
 			attuid: empId,
-			colors: selectedColor,
+			colors: "PINK",
 			token: tokenPink,
 			duplicates: isDuplicateYesOrNo,
 		};
