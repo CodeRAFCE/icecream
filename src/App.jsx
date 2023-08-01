@@ -47,7 +47,7 @@ const COLOR_OPTIONS = [
 ];
 
 function App() {
-	const [sheetsData, setSheetsData] = useState(FALLBACK_DATA);
+	const [sheetsData, setSheetsData] = useState([]);
 	const [empId, setEmpId] = useState("");
 	const [messageStatus, setMessageStatus] = useState({status: "", message: ""});
 	const [loading, setLoading] = useState(false);
@@ -58,10 +58,12 @@ function App() {
 	const [tokenBlueTwo, setTokenBlueTwo] = useState("");
 	const [selectedColor, setSelectedColor] = useState("Pink");
 	const [duplicate, setDuplicate] = useState(false);
+	const [code, setCode] = useState(false);
 	// const [isSubmitted, setIsSubmitted] = useState(false);
 
 	// Function to reset form fields
 	const resetForm = () => {
+		setLoading(false);
 		console.log("RESET FORM");
 		setEmpId("");
 		setTokenPink("");
@@ -71,7 +73,6 @@ function App() {
 		setTokenBlueTwo("");
 		setDuplicate(false);
 		setSelectedColor("Pink");
-		setLoading(false);
 		setMessageStatus({status: "", message: ""});
 	};
 
@@ -84,7 +85,8 @@ function App() {
 			.catch((error) => {
 				console.log(error);
 				resetForm();
-			});
+			})
+			.finally(() => setLoading(false));
 
 		setLoading(false);
 
@@ -109,7 +111,8 @@ function App() {
 			.catch((error) => {
 				console.log(error);
 				resetForm();
-			});
+			})
+			.finally(() => setLoading(false));
 	};
 
 	useEffect(() => {
@@ -153,6 +156,11 @@ function App() {
 	const onEmpIdChange = (event) => {
 		const employeeId = event.target.value;
 		setEmpId(employeeId);
+	};
+
+	const onCodeChange = (event) => {
+		const codeValue = event.target.value;
+		setCode(codeValue);
 	};
 
 	const handleCheckboxChange = () => {
@@ -262,6 +270,15 @@ function App() {
 		// Reset previous error messages
 		setMessageStatus({status: "", message: ""});
 
+		if (code === import.meta.env.VITE_PERMISSION_CODE) {
+			setMessageStatus({
+				status: "ALERT",
+				message: "YOU ARE NOT AUTHORIZED TO DUPLICATE AN ENTRY",
+			});
+			setLoading(false);
+			return; // Do not proceed with form submission
+		}
+
 		const isTokenAvailable =
 			Boolean(tokenPink) &&
 			Boolean(tokenGreenOne) &&
@@ -280,9 +297,9 @@ function App() {
 		}
 
 		// Check if empId exists in sheetsData
-		const isAttUidDuplicate = sheetsData?.some(
-			(entry) => entry?.attuid.toUpperCase() === empId.toUpperCase()
-		);
+		const isAttUidDuplicate =
+			Array.isArray(sheetsData) &&
+			sheetsData?.some((entry) => entry?.attuid.toUpperCase() === empId.toUpperCase());
 
 		// const isTokenDuplicate = sheetsData?.some(
 		// 	(entry) => Number(entry?.token) === Number(tokenPink)
@@ -349,9 +366,7 @@ function App() {
 			<main className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
 				<section>
 					<div className="text-center mb-8">
-						<h1 className="text-3xl md:text-5xl text-[#3F4075] font-semibold">
-							Token Generation System
-						</h1>
+						<h1 className="text-3xl md:text-5xl text-[#3F4075] font-semibold">Token System</h1>
 					</div>
 
 					<div className="bg-slate-50 rounded-3xl md:py-14 py-10 shadow-md px-4 flex flex-col justify-between gap-8">
@@ -526,6 +541,30 @@ function App() {
 										Only for duplicate entries
 									</label>
 								</fieldset>
+
+								{duplicate && (
+									<fieldset>
+										<label
+											htmlFor="code"
+											className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
+										>
+											Enter Code For Duplicate
+										</label>
+
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
+											<input
+												name="code"
+												id="code"
+												type="number"
+												value={code}
+												onChange={onCodeChange}
+												placeholder="Enter Code"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+									</fieldset>
+								)}
 							</div>
 
 							<div className="flex flex-col gap-3 justify-center mt-6 md:flex-row">
