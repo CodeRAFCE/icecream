@@ -40,7 +40,10 @@ const CustomDropdown = ({options, onChange, resetValue}) => {
 					onClick={toggleDropdown}
 					className="cursor-pointer shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] bg-white rounded-full py-4 px-6 flex items-center mt-2 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 				>
-					{selectedOption.name}
+					<div className="flex items-center gap-2">
+						<div className={`h-6 w-6 rounded-full ${selectedOption.color}`}></div>
+						<span className="uppercase">{selectedOption.name}</span>
+					</div>
 					<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">
 						<svg
 							className={`fill-current h-5 w-5 ${isOpen ? "transform rotate-180" : ""}`}
@@ -61,9 +64,10 @@ const CustomDropdown = ({options, onChange, resetValue}) => {
 									onClick={() => handleOptionClick(option)}
 									className={`cursor-pointer py-2 px-4 hover:bg-gray-200 ${
 										selectedOption.color === color ? "bg-gray-100" : ""
-									}`}
+									} flex items-center gap-2`}
 								>
-									{name}
+									<div className={`h-6 w-6 rounded-full ${color}`}></div>
+									<span className="uppercase">{name}</span>
 								</div>
 							);
 						})}

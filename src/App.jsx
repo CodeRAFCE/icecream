@@ -208,19 +208,21 @@ function App() {
 				</nav>
 			</header>
 
-			<main className="max-w-7xl mx-auto px-6 flex flex-col gap-6">
+			<main className="max-w-7xl mx-auto px-6 flex flex-col gap-10">
 				<section>
 					<div className="text-center mb-8">
-						<h1 className="text-5xl text-[#3F4075] font-semibold">Token Generation System</h1>
+						<h1 className="text-3xl md:text-5xl text-[#3F4075] font-semibold">
+							Token Generation System
+						</h1>
 					</div>
 
-					<div className="bg-slate-50 rounded-3xl py-14 shadow-md px-4 flex flex-col justify-between gap-8">
+					<div className="bg-slate-50 rounded-3xl md:py-14 py-10 shadow-md px-4 flex flex-col justify-between gap-8">
 						<form className="max-w-xl mx-auto w-full" onSubmit={handleSubmit}>
 							<div className="space-y-6">
 								<fieldset>
 									<label
 										htmlFor="empId"
-										className="font-semibold uppercase text-xl text-[#3F4075] "
+										className="font-semibold uppercase text-base md:text-xl text-[#3F4075] "
 									>
 										ATTUID
 									</label>
@@ -243,7 +245,7 @@ function App() {
 								<fieldset>
 									<label
 										htmlFor="colors"
-										className="font-semibold uppercase text-xl text-[#3F4075]"
+										className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
 									>
 										colors
 									</label>
@@ -261,7 +263,10 @@ function App() {
 								</fieldset>
 
 								<fieldset>
-									<label htmlFor="token" className="font-semibold uppercase text-xl text-[#3F4075]">
+									<label
+										htmlFor="token"
+										className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
+									>
 										Token
 									</label>
 
@@ -313,7 +318,7 @@ function App() {
 								</fieldset>
 							</div>
 
-							<div className="flex flex-row gap-3 justify-center mt-6">
+							<div className="flex flex-col gap-3 justify-center mt-6 md:flex-row">
 								<button
 									type="submit"
 									className="uppercase px-12 py-2 bg-green-400 text-white rounded-full disabled:bg-slate-400 disabled:cursor-not-allowed font-medium"
@@ -323,7 +328,7 @@ function App() {
 
 								<a
 									href={`https://docs.google.com/spreadsheets/d/1Sk2djRliwCdoyLKCleICc1bxoBbZ41_2Tu7IOQ0ic4Y/edit#gid=0`}
-									className="uppercase px-12 py-2 bg-blue-400 text-white rounded-full font-medium"
+									className="uppercase px-12 py-2 bg-blue-400 text-white rounded-full font-medium text-center"
 									target="_blank"
 									rel="noreferrer"
 								>
@@ -338,7 +343,7 @@ function App() {
 
 				<footer>
 					<div className="text-center">
-						<p className="text-slate-400">
+						<p className="text-slate-400 text-sm md:text-base">
 							Copyright© Eventive Communications, Developed By PrismScale Pvt. Ltd.
 						</p>
 					</div>
