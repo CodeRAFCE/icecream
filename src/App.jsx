@@ -103,7 +103,7 @@ function App() {
 			.then((response) => {
 				console.log("DATA SENT");
 				response.json();
-				// getSheetData();
+				getSheetData();
 				resetForm();
 			})
 			.catch((error) => {
@@ -113,7 +113,8 @@ function App() {
 	};
 
 	useEffect(() => {
-		// getSheetData();
+		getSheetData();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const sendSheetEntryReq = (isDuplicateYesOrNo) => {
@@ -143,18 +144,6 @@ function App() {
 		sendSheetEntry(PINK_DATA, "PINK");
 		sendSheetEntry(GREEN_DATA, "GREEN");
 		sendSheetEntry(BLUE_DATA, "BLUE");
-	};
-
-	const tokenValidation = (tokenValue, setTokenValue) => {
-		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
-			console.log("TOKEN VALIDATION");
-			// If the token is not a number or is outside the range, set it to an empty string
-			// or you can display an error message to the user
-			setTokenValue("");
-			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
-		}
-
-		return;
 	};
 
 	// * --------------------------------------------------------
