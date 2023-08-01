@@ -3,7 +3,8 @@ import CustomDropdown from "./components/CustomDropdown";
 import MessageStatus from "./components/MessageStatus";
 import ColorCode from "./components/ColorCode";
 
-const SHEET_URL = `https://sheetdb.io/api/v1/${import.meta.env.VITE_SHEETDB_ID}`;
+const AUTHORIZATION_CODE = 7777777;
+const SHEET_URL = `https://sheetdb.io/api/v1/lzr9b0u8dka3e`;
 const MULTI_SHEET_URL = `${SHEET_URL}?sheet=`;
 
 // eslint-disable-next-line no-unused-vars
@@ -270,7 +271,7 @@ function App() {
 		// Reset previous error messages
 		setMessageStatus({status: "", message: ""});
 
-		const isCodeAuthorized = code === `${import.meta.env.VITE_PERMISSION_CODE}`;
+		const isCodeAuthorized = code === AUTHORIZATION_CODE; //`${import.meta.env.VITE_PERMISSION_CODE}`
 
 		if (!isCodeAuthorized && duplicate) {
 			setMessageStatus({
