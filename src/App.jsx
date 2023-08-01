@@ -1,51 +1,55 @@
 import {useEffect, useState} from "react";
 import CustomDropdown from "./components/CustomDropdown";
-import AlertIcon from "./components/AlertIcon";
+import MessageStatus from "./components/MessageStatus";
+import ColorCode from "./components/ColorCode";
 
 const SHEET_URL = `https://sheetdb.io/api/v1/0d686gm3nst8w`;
 // const MULTI_SHEET_URL = `${SHEET_URL}?sheet=`;
 
+// eslint-disable-next-line no-unused-vars
+const FALLBACK_DATA = [
+	{
+		employeeID: "MNK1234",
+		colors: "ORANGE",
+		token: "1",
+		duplicates: "no",
+	},
+	{
+		employeeID: "KNJ1234",
+		colors: "YELLOW",
+		token: "2",
+		duplicates: "no",
+	},
+	{
+		employeeID: "MNK1234",
+		colors: "ORANGE",
+		token: "3",
+		duplicates: "yes",
+	},
+	{
+		employeeID: "MNK1234",
+		colors: "ORANGE",
+		token: "1",
+		duplicates: "yes",
+	},
+	{
+		employeeID: "MNK1234",
+		colors: "ORANGE",
+		token: "1",
+		duplicates: "yes",
+	},
+];
+
 const COLOR_OPTIONS = [
-	{color: "orange", name: "ORANGE", id: 2, icon: ""},
-	{color: "yellow", name: "YELLOW", id: 3, icon: ""},
-	{color: "green", name: "GREEN", id: 4, icon: ""},
-	{color: "blue", name: "BLUE", id: 5, icon: ""},
-	{color: "pink", name: "PINK", id: 6, icon: ""},
+	{color: "bg-orange-400", name: "Orange", id: 2, icon: ""},
+	{color: "bg-yellow-400", name: "Yellow", id: 3, icon: ""},
+	{color: "bg-lime-400", name: "Green", id: 4, icon: ""},
+	{color: "bg-blue-400", name: "Blue", id: 5, icon: ""},
+	{color: "bg-pink-400", name: "Pink", id: 6, icon: ""},
 ];
 
 function App() {
-	const [sheetsData, setSheetsData] = useState([
-		{
-			employeeID: "MNK1234",
-			colors: "ORANGE",
-			token: "1",
-			duplicates: "no",
-		},
-		{
-			employeeID: "KNJ1234",
-			colors: "YELLOW",
-			token: "2",
-			duplicates: "no",
-		},
-		{
-			employeeID: "MNK1234",
-			colors: "ORANGE",
-			token: "3",
-			duplicates: "yes",
-		},
-		{
-			employeeID: "MNK1234",
-			colors: "ORANGE",
-			token: "1",
-			duplicates: "yes",
-		},
-		{
-			employeeID: "MNK1234",
-			colors: "ORANGE",
-			token: "1",
-			duplicates: "yes",
-		},
-	]);
+	const [sheetsData, setSheetsData] = useState();
 	const [empId, setEmpId] = useState("");
 	const [messageStatus, setMessageStatus] = useState({status: "", message: ""});
 	const [loading, setLoading] = useState(false);
@@ -88,7 +92,7 @@ function App() {
 	};
 
 	useEffect(() => {
-		// getSheetData();
+		getSheetData();
 	}, []);
 
 	// * --------------------------------------------------------
@@ -108,6 +112,10 @@ function App() {
 	const onEmpIdChange = (event) => {
 		const employeeId = event.target.value;
 		setEmpId(employeeId);
+	};
+
+	const handleCheckboxChange = () => {
+		setDuplicate(!duplicate);
 	};
 
 	const onTokenChange = (event) => {
@@ -188,115 +196,155 @@ function App() {
 	// * --------------------------------------------------------
 
 	return (
-		<>
-			<header className="h-20 w-full mb-10">
+		<div className="h-screen relative">
+			<header className="h-20 md:h-28 w-full mb-4">
 				<nav className="max-w-7xl h-full mx-auto px-6 flex items-center justify-between">
-					<div>LOGO1</div>
-					<div>LOGO2</div>
+					<div>
+						<img src="/at&t_logo.png" alt="at&t" className="h-20 md:h-28" />
+					</div>
+					<div>
+						<img src="/favourance_logo.png" alt="favourance" className="h-20 md:h-28" />
+					</div>
 				</nav>
 			</header>
 
-			<main className="max-w-7xl mx-auto px-6">
+			<main className="max-w-7xl mx-auto px-6 flex flex-col gap-6">
 				<section>
-					<div className="">
-						{messageStatus && (
-							<>
-								{messageStatus.status === "ALERT" && (
-									<div className="my-6 flex items-center gap-3 justify-center bg-red-300 py-3 md:max-w-4xl md:mx-auto rounded-sm">
-										<AlertIcon />
-										<span className="text-lg font-semibold text-white">
-											{messageStatus.message}
-										</span>
-									</div>
-								)}
-							</>
-						)}
+					<div className="text-center mb-8">
+						<h1 className="text-5xl text-[#3F4075] font-semibold">Token Generation System</h1>
 					</div>
 
-					<form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
-						<div className="space-y-4">
-							<fieldset>
-								<label htmlFor="empId" className="font-semibold uppercase">
-									Employee ID
-								</label>
-								<input
-									name="empId"
-									id="empId"
-									type="text"
-									value={empId}
-									onChange={onEmpIdChange}
-									placeholder="Enter Employee ID"
-									className="border border-slate-500 focus:outline-none px-2 py-2 w-full rounded"
-									required
-								/>
-							</fieldset>
+					<div className="bg-slate-50 rounded-3xl py-14 shadow-md px-4 flex flex-col justify-between gap-8">
+						<form className="max-w-xl mx-auto w-full" onSubmit={handleSubmit}>
+							<div className="space-y-6">
+								<fieldset>
+									<label
+										htmlFor="empId"
+										className="font-semibold uppercase text-xl text-[#3F4075] "
+									>
+										ATTUID
+									</label>
+									<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
+										<input
+											name="empId"
+											id="empId"
+											type="text"
+											value={empId}
+											onChange={onEmpIdChange}
+											placeholder="Enter ATTUID"
+											className="focus:outline-none px-2 py-2 w-full rounded"
+											required
+										/>
+									</div>
+								</fieldset>
 
-							{/* ------------------------------------------------------------------ */}
+								{/* ------------------------------------------------------------------ */}
 
-							<fieldset>
-								<label htmlFor="colors" className="font-semibold uppercase">
-									colors
-								</label>
+								<fieldset>
+									<label
+										htmlFor="colors"
+										className="font-semibold uppercase text-xl text-[#3F4075]"
+									>
+										colors
+									</label>
 
-								<CustomDropdown
-									options={COLOR_OPTIONS}
-									onChange={setSelectedColor}
-									resetValue={selectedColor}
-								/>
-							</fieldset>
+									<CustomDropdown
+										options={COLOR_OPTIONS}
+										onChange={setSelectedColor}
+										resetValue={selectedColor}
+									/>
+									<ColorCode
+										colors={COLOR_OPTIONS}
+										onChange={setSelectedColor}
+										resetValue={selectedColor}
+									/>
+								</fieldset>
 
-							<fieldset>
-								<label htmlFor="token" className="font-semibold uppercase">
-									Token
-								</label>
-								<input
-									name="token"
-									id="token"
-									type="number"
-									value={token}
-									onChange={onTokenChange}
-									placeholder="Enter Token"
-									className="border border-slate-500 focus:outline-none px-2 py-2 w-full rounded appearance-none"
-									required
-								/>
-							</fieldset>
+								<fieldset>
+									<label htmlFor="token" className="font-semibold uppercase text-xl text-[#3F4075]">
+										Token
+									</label>
 
-							<fieldset className="flex items-center gap-2">
-								<input
-									type="checkbox"
-									name="dups"
-									id="dups"
-									checked={duplicate}
-									value={duplicate}
-									onChange={() => setDuplicate(!duplicate)}
-								/>
-								<label htmlFor="dups">
-									Only check if you have to create a duplicate entry in the sheet
-								</label>
-							</fieldset>
-						</div>
+									<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
+										<input
+											name="token"
+											id="token"
+											type="number"
+											value={token}
+											onChange={onTokenChange}
+											placeholder="Enter Token"
+											className="focus:outline-none px-2 py-2 w-full rounded"
+											required
+										/>
+									</div>
+								</fieldset>
 
-						<div className="flex flex-row gap-3 justify-center mt-6">
-							<button
-								type="submit"
-								className="uppercase px-6 py-2 bg-orange-400 text-white rounded disabled:bg-slate-400 disabled:cursor-not-allowed"
-							>
-								{loading ? "Loading..." : "Send"}
-							</button>
+								<fieldset className="flex items-center gap-2">
+									<div
+										className="checkbox-container"
+										style={{
+											display: "flex",
+											alignItems: "center",
+											justifyContent: "center",
+											width: "20px",
+											height: "20px",
+											border: "2px solid #3F4075",
+											borderRadius: "4px",
+											cursor: "pointer",
+											background: duplicate ? "#3F4075" : "transparent",
+										}}
+										onClick={handleCheckboxChange}
+									>
+										{duplicate && (
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												fill="white"
+												width="12px"
+												height="12px"
+											>
+												<path d="M19.59 6.58L10 16.17l-4.59-4.58a.996.996 0 10-1.41 1.41l5.3 5.3c.39.39 1.03.39 1.42 0l9.01-9a.996.996 0 000-1.41c-.38-.39-1.02-.39-1.41 0z" />
+											</svg>
+										)}
+									</div>
+									<label htmlFor="dups" className="text-lg text-[#3F4075]">
+										Only for duplicate entries
+									</label>
+								</fieldset>
+							</div>
 
-							<a
-								href={`https://docs.google.com/spreadsheets/d/1Sk2djRliwCdoyLKCleICc1bxoBbZ41_2Tu7IOQ0ic4Y/edit#gid=0`}
-								className="uppercase px-6 py-2 bg-orange-400 text-white rounded"
-								target="_blank"
-								rel="noreferrer"
-							>
-								GO to SHEET
-							</a>
-						</div>
-					</form>
+							<div className="flex flex-row gap-3 justify-center mt-6">
+								<button
+									type="submit"
+									className="uppercase px-12 py-2 bg-green-400 text-white rounded-full disabled:bg-slate-400 disabled:cursor-not-allowed font-medium"
+								>
+									{loading ? "Loading..." : "Send"}
+								</button>
+
+								<a
+									href={`https://docs.google.com/spreadsheets/d/1Sk2djRliwCdoyLKCleICc1bxoBbZ41_2Tu7IOQ0ic4Y/edit#gid=0`}
+									className="uppercase px-12 py-2 bg-blue-400 text-white rounded-full font-medium"
+									target="_blank"
+									rel="noreferrer"
+								>
+									view
+								</a>
+							</div>
+						</form>
+
+						<MessageStatus messageStatus={messageStatus} />
+					</div>
 				</section>
+
+				<footer>
+					<div className="text-center">
+						<p className="text-slate-400">
+							Copyright© Eventive Communications, Developed By PrismScale Pvt. Ltd.
+						</p>
+					</div>
+				</footer>
 			</main>
-		</>
+		</div>
 	);
 }
 

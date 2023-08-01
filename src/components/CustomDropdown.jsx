@@ -35,15 +35,15 @@ const CustomDropdown = ({options, onChange, resetValue}) => {
 				<div className="absolute inset-0 bg-black opacity-0 z-10" onClick={handleClose} />
 			) : null}
 
-			<div className="relative">
+			<div className="relative md:hidden">
 				<div
 					onClick={toggleDropdown}
-					className="cursor-pointer bg-white border border-slate-500 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+					className="cursor-pointer shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] bg-white rounded-full py-4 px-6 flex items-center mt-2 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 				>
 					{selectedOption.name}
-					<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+					<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">
 						<svg
-							className={`fill-current h-4 w-4 ${isOpen ? "transform rotate-180" : ""}`}
+							className={`fill-current h-5 w-5 ${isOpen ? "transform rotate-180" : ""}`}
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 20 20"
 						>
@@ -52,7 +52,7 @@ const CustomDropdown = ({options, onChange, resetValue}) => {
 					</div>
 				</div>
 				{isOpen && (
-					<div className="mt-2 py-1 bg-white border border-gray-300 rounded shadow-lg absolute z-50 w-full">
+					<div className="mt-2 py-1 bg-white border border-gray-300 rounded-lg shadow-lg absolute z-50 w-full">
 						{options.map((option) => {
 							const {color, name, id} = option;
 							return (
