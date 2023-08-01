@@ -4,7 +4,7 @@ import MessageStatus from "./components/MessageStatus";
 import ColorCode from "./components/ColorCode";
 
 const SHEET_URL = `https://sheetdb.io/api/v1/0d686gm3nst8w`;
-// const MULTI_SHEET_URL = `${SHEET_URL}?sheet=`;
+const MULTI_SHEET_URL = `${SHEET_URL}?sheet=`;
 
 // eslint-disable-next-line no-unused-vars
 const FALLBACK_DATA = [
@@ -41,73 +41,125 @@ const FALLBACK_DATA = [
 ];
 
 const COLOR_OPTIONS = [
-	{color: "bg-orange-400", name: "Orange", id: 2, icon: ""},
-	{color: "bg-yellow-400", name: "Yellow", id: 3, icon: ""},
+	{color: "bg-pink-400", name: "Pink", id: 6, icon: ""},
 	{color: "bg-lime-400", name: "Green", id: 4, icon: ""},
 	{color: "bg-blue-400", name: "Blue", id: 5, icon: ""},
-	{color: "bg-pink-400", name: "Pink", id: 6, icon: ""},
 ];
 
 function App() {
-	const [sheetsData, setSheetsData] = useState();
+	const [sheetsData, setSheetsData] = useState(FALLBACK_DATA);
 	const [empId, setEmpId] = useState("");
 	const [messageStatus, setMessageStatus] = useState({status: "", message: ""});
 	const [loading, setLoading] = useState(false);
-	const [token, setToken] = useState("");
-	const [selectedColor, setSelectedColor] = useState("ORANGE");
+	const [tokenPink, setTokenPink] = useState("");
+	const [tokenGreenOne, setTokenGreenOne] = useState("");
+	const [tokenGreenTwo, setTokenGreenTwo] = useState("");
+	const [tokenBlueOne, setTokenBlueOne] = useState("");
+	const [tokenBlueTwo, setTokenBlueTwo] = useState("");
+	const [selectedColor, setSelectedColor] = useState("Pink");
 	const [duplicate, setDuplicate] = useState(false);
 	// const [isSubmitted, setIsSubmitted] = useState(false);
+
+	// Function to reset form fields
+	const resetForm = () => {
+		console.log("RESET FORM");
+		setEmpId("");
+		setTokenPink("");
+		setTokenGreenOne("");
+		setTokenGreenTwo("");
+		setTokenBlueOne("");
+		setTokenBlueTwo("");
+		setDuplicate(false);
+		setSelectedColor("Pink");
+		setLoading(false);
+		setMessageStatus({status: "", message: ""});
+	};
 
 	const getSheetData = () => {
 		setLoading(true);
 
 		fetch(SHEET_URL)
 			.then((response) => response.json())
-			.then((data) => setSheetsData(data));
+			.then((data) => setSheetsData(data))
+			.catch((error) => {
+				console.log(error);
+				resetForm();
+			});
 
 		setLoading(false);
 
 		console.log("GET SHEET DATA");
 	};
 
-	const sendSheetEntry = (data) => {
-		fetch(SHEET_URL, {
+	const sendSheetEntry = (data, sheetName) => {
+		fetch(`${MULTI_SHEET_URL}${sheetName}`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({
-				employeeID: data.empId.toUpperCase(),
-				colors: selectedColor,
-				token: data.token,
-				duplicates: data.isDuplicateYesOrNo,
-			}),
-		}).then((response) => {
-			console.log("DATA SENT");
-			response.json();
-			resetForm();
-			getSheetData();
-		});
+			body: JSON.stringify(data),
+		})
+			.then((response) => {
+				console.log("DATA SENT");
+				response.json();
+				// getSheetData();
+				resetForm();
+			})
+			.catch((error) => {
+				console.log(error);
+				resetForm();
+			});
 	};
 
 	useEffect(() => {
-		getSheetData();
+		// getSheetData();
 	}, []);
+
+	const sendSheetEntryReq = (isDuplicateYesOrNo) => {
+		const PINK_DATA = {
+			attuid: empId,
+			colors: selectedColor,
+			token: tokenPink,
+			duplicates: isDuplicateYesOrNo,
+		};
+
+		const GREEN_DATA = {
+			attuid: empId,
+			colors: selectedColor,
+			token1: tokenGreenOne,
+			token2: tokenBlueTwo,
+			duplicates: isDuplicateYesOrNo,
+		};
+
+		const BLUE_DATA = {
+			attuid: empId,
+			colors: selectedColor,
+			token1: tokenBlueOne,
+			token2: tokenGreenTwo,
+			duplicates: isDuplicateYesOrNo,
+		};
+
+		sendSheetEntry(PINK_DATA, "PINK");
+		sendSheetEntry(GREEN_DATA, "GREEN");
+		sendSheetEntry(BLUE_DATA, "BLUE");
+	};
+
+	const tokenValidation = (tokenValue, setTokenValue) => {
+		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
+			// If the token is not a number or is outside the range, set it to an empty string
+			// or you can display an error message to the user
+			setTokenValue("");
+			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
+		}
+
+		return;
+	};
 
 	// * --------------------------------------------------------
 	// * FORM HANDLER METHODS
-
-	// Function to reset form fields
-	const resetForm = () => {
-		console.log("RESET FORM");
-		setEmpId("");
-		setToken("");
-		setDuplicate(false);
-		setSelectedColor("ORANGE");
-		setLoading(false);
-		setMessageStatus("");
-	};
+	// #region
 
 	const onEmpIdChange = (event) => {
 		const employeeId = event.target.value;
@@ -118,22 +170,102 @@ function App() {
 		setDuplicate(!duplicate);
 	};
 
-	const onTokenChange = (event) => {
+	// ----------------------------------------------------------
+	// * PINK TOKEN
+	const onTokenPinkChange = (event) => {
 		const tokenValue = event.target.value;
 
 		// Validate the token value to be a number between 0 and 100
 		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
 			// If the token is not a number or is outside the range, set it to an empty string
 			// or you can display an error message to the user
-			setToken("");
+			setTokenPink("");
 			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
 			return;
 		}
 
-		setToken(parseInt(tokenValue, 10));
+		setTokenPink(parseInt(tokenValue, 10));
 		setMessageStatus({});
 	};
 
+	// ----------------------------------------------------------
+	// * GREEN TOKEN
+	const onTokenGreenOneChange = (event) => {
+		const tokenValue = event.target.value;
+
+		// Validate the token value to be a number between 0 and 100
+		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
+			// If the token is not a number or is outside the range, set it to an empty string
+			// or you can display an error message to the user
+			setTokenGreenOne("");
+			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
+			return;
+		}
+
+		setTokenGreenOne(parseInt(tokenValue, 10));
+		setMessageStatus({});
+	};
+
+	const onTokenGreenTwoChange = (event) => {
+		const tokenValue = event.target.value;
+
+		// Validate the token value to be a number between 0 and 100
+		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
+			// If the token is not a number or is outside the range, set it to an empty string
+			// or you can display an error message to the user
+			setTokenGreenTwo("");
+			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
+			return;
+		}
+
+		setTokenGreenTwo(parseInt(tokenValue, 10));
+		setMessageStatus({});
+	};
+
+	// ----------------------------------------------------------
+	// * BLUE TOKEN
+	const onTokenBlueOneChange = (event) => {
+		const tokenValue = event.target.value;
+
+		// Validate the token value to be a number between 0 and 100
+		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
+			// If the token is not a number or is outside the range, set it to an empty string
+			// or you can display an error message to the user
+			setTokenBlueOne("");
+			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
+			return;
+		}
+
+		setTokenBlueOne(parseInt(tokenValue, 10));
+		setMessageStatus({});
+	};
+
+	const onTokenBlueTwoChange = (event) => {
+		const tokenValue = event.target.value;
+
+		// Validate the token value to be a number between 0 and 100
+		if (isNaN(tokenValue) || tokenValue < 0 || tokenValue > 100) {
+			console.log("TOKEN VALIDATION");
+			// If the token is not a number or is outside the range, set it to an empty string
+			// or you can display an error message to the user
+			setTokenBlueTwo("");
+			setMessageStatus({status: "ALERT", message: "Token must be a number between 0 and 100"});
+			return;
+		}
+
+		setTokenBlueTwo(parseInt(tokenValue, 10));
+		setMessageStatus({});
+	};
+
+	// * --------------------------------------------------------
+	// #endregion
+
+	// ----------------------------------------------------------
+	// * HANDLE SUBMIT METHOD
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
@@ -141,16 +273,35 @@ function App() {
 		// Reset previous error messages
 		setMessageStatus({status: "", message: ""});
 
+		const isTokenAvailable =
+			Boolean(tokenPink) &&
+			Boolean(tokenGreenOne) &&
+			Boolean(tokenGreenTwo) &&
+			Boolean(tokenBlueOne) &&
+			Boolean(tokenBlueTwo);
+
+		if (!isTokenAvailable) {
+			console.log("TOKEN CHECKS");
+			setMessageStatus({
+				status: "ALERT",
+				message: "PLEASE FILL ALL PINK, GREEN & BLUE TOKENS",
+			});
+			setLoading(false);
+			return; // Do not proceed with form submission
+		}
+
 		// Check if empId exists in sheetsData
-		const isEmpIdDuplicate = sheetsData?.some(
+		const isAttUidDuplicate = sheetsData?.some(
 			(entry) => entry?.employeeID.toUpperCase() === empId.toUpperCase()
 		);
 
-		const isTokenDuplicate = sheetsData?.some((entry) => Number(entry?.token) === Number(token));
+		// const isTokenDuplicate = sheetsData?.some(
+		// 	(entry) => Number(entry?.token) === Number(tokenPink)
+		// );
 
-		console.log(isTokenDuplicate, duplicate);
+		// console.log(isTokenDuplicate, duplicate);
 
-		if (isEmpIdDuplicate && !duplicate) {
+		if (isAttUidDuplicate && !duplicate) {
 			setMessageStatus({
 				status: "ALERT",
 				message: "ATTUID ALREADY REGISTERED",
@@ -159,41 +310,38 @@ function App() {
 			return; // Do not proceed with form submission
 		}
 
-		if (isTokenDuplicate) {
-			setMessageStatus({
-				status: "ALERT",
-				message: `TOKEN ALREADY EXISTS`,
-			});
-			setLoading(false);
-			return; // Do not proceed with form submission
-		}
+		// if (isTokenDuplicate) {
+		// 	setMessageStatus({
+		// 		status: "ALERT",
+		// 		message: `TOKEN ALREADY EXISTS`,
+		// 	});
+		// 	setLoading(false);
+		// 	return; // Do not proceed with form submission
+		// }
 
 		const isDuplicateYesOrNo = duplicate ? "yes" : "no";
 
-		const data = {
-			empId,
-			// uid,
-			isDuplicateYesOrNo,
-			token,
-			selectedColor,
-		};
-
-		if (!isEmpIdDuplicate && !isTokenDuplicate) {
+		//&& !isTokenDuplicate
+		if (!isAttUidDuplicate) {
 			console.log("sending normally");
-			sendSheetEntry(data);
+
+			sendSheetEntryReq(isDuplicateYesOrNo);
+
 			return;
 		}
 
+		// && !isTokenDuplicate
 		// sending a duplicate Employee ID entry if duplicate is checked
-		if (isEmpIdDuplicate && duplicate && !isTokenDuplicate) {
+		if (isAttUidDuplicate && duplicate) {
 			console.log("send from duplicate");
-			sendSheetEntry(data);
+
+			sendSheetEntryReq(isDuplicateYesOrNo);
+
 			return;
 		}
 
 		setLoading(false);
 	};
-	// * --------------------------------------------------------
 
 	return (
 		<div className="h-screen relative">
@@ -202,6 +350,7 @@ function App() {
 					<div>
 						<img src="/at&t_logo.png" alt="at&t" className="h-20 md:h-28" />
 					</div>
+
 					<div>
 						<img src="/favourance_logo.png" alt="favourance" className="h-20 md:h-28" />
 					</div>
@@ -262,27 +411,99 @@ function App() {
 									/>
 								</fieldset>
 
-								<fieldset>
-									<label
-										htmlFor="token"
-										className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
-									>
-										Token
-									</label>
+								{selectedColor === "Pink" ? (
+									<fieldset>
+										<label
+											htmlFor="token"
+											className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
+										>
+											Pink Token
+										</label>
 
-									<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
-										<input
-											name="token"
-											id="token"
-											type="number"
-											value={token}
-											onChange={onTokenChange}
-											placeholder="Enter Token"
-											className="focus:outline-none px-2 py-2 w-full rounded"
-											required
-										/>
-									</div>
-								</fieldset>
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
+											<input
+												name="token"
+												id="token"
+												type="number"
+												value={tokenPink}
+												onChange={onTokenPinkChange}
+												placeholder="Enter Token"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+									</fieldset>
+								) : selectedColor === "Green" ? (
+									<fieldset>
+										<label
+											htmlFor="token"
+											className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
+										>
+											Green Token
+										</label>
+
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 mb-4 bg-white">
+											<input
+												name="token"
+												id="token"
+												type="number"
+												value={tokenGreenOne}
+												onChange={onTokenGreenOneChange}
+												placeholder="Enter Token"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2  bg-white">
+											<input
+												name="token"
+												id="token"
+												type="number"
+												value={tokenGreenTwo}
+												onChange={onTokenGreenTwoChange}
+												placeholder="Enter Token"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+									</fieldset>
+								) : selectedColor === "Blue" ? (
+									<fieldset>
+										<label
+											htmlFor="token"
+											className="font-semibold uppercase text-base md:text-xl text-[#3F4075]"
+										>
+											Blue Token
+										</label>
+
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 mb-4 bg-white">
+											<input
+												name="token"
+												id="token"
+												type="number"
+												value={tokenBlueOne}
+												onChange={onTokenBlueOneChange}
+												placeholder="Enter Token"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+
+										<div className="shadow-[0px_1px_5px_0px_rgba(0,0,0,0.20)] rounded-full py-1 px-4 flex items-center mt-2 bg-white">
+											<input
+												name="token"
+												id="token"
+												type="number"
+												value={tokenBlueTwo}
+												onChange={onTokenBlueTwoChange}
+												placeholder="Enter Token"
+												className="focus:outline-none px-2 py-2 w-full rounded"
+												required
+											/>
+										</div>
+									</fieldset>
+								) : null}
 
 								<fieldset className="flex items-center gap-2">
 									<div

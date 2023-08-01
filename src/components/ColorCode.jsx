@@ -20,17 +20,17 @@ const ColorCode = ({colors, onChange, resetValue}) => {
 		onChange(option.name); // Passing the selected value to the parent component
 	};
 	return (
-		<div className="md:flex gap-4 justify-between mt-2 hidden">
+		<div className="md:flex gap-8 items-center justify-center mt-2 hidden">
 			{colors?.map((item) => {
 				const {color, name, id} = item;
 				return (
 					<div
 						key={id}
-						className="text-center flex flex-col items-center cursor-pointer"
+						className="text-center flex flex-col items-center cursor-pointer w-full"
 						onClick={() => handleOptionClick(item)}
 					>
 						<span className="text-gray-400 capitalize text-sm mb-2">{name}</span>
-						<div className={`h-14 w-14 rounded-full ml-0 ${color} flex justify-end items-end`}>
+						<div className={`h-14 w-2/3 rounded-full ml-0 ${color} flex justify-end items-end`}>
 							{selectedOption.name === name ? <CheckIcon /> : null}
 						</div>
 					</div>
