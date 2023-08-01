@@ -114,7 +114,7 @@ function App() {
 
 	useEffect(() => {
 		getSheetData();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const sendSheetEntryReq = (isDuplicateYesOrNo) => {
@@ -127,7 +127,7 @@ function App() {
 
 		const GREEN_DATA = {
 			attuid: empId,
-			colors: selectedColor,
+			colors: "GREEN",
 			token1: tokenGreenOne,
 			token2: tokenBlueTwo,
 			duplicates: isDuplicateYesOrNo,
@@ -135,7 +135,7 @@ function App() {
 
 		const BLUE_DATA = {
 			attuid: empId,
-			colors: selectedColor,
+			colors: "BLUE",
 			token1: tokenBlueOne,
 			token2: tokenGreenTwo,
 			duplicates: isDuplicateYesOrNo,
@@ -281,7 +281,7 @@ function App() {
 
 		// Check if empId exists in sheetsData
 		const isAttUidDuplicate = sheetsData?.some(
-			(entry) => entry?.employeeID.toUpperCase() === empId.toUpperCase()
+			(entry) => entry?.attuid.toUpperCase() === empId.toUpperCase()
 		);
 
 		// const isTokenDuplicate = sheetsData?.some(
